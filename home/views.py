@@ -1,8 +1,8 @@
 from django.shortcuts import render,redirect
 
 #
-from django.contrib.auth import authenticate , login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate , login , logout
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -30,9 +30,26 @@ def loginuser(request):
 
 def logoutuser(request):
     logout(request)
-    return render(request,'logout.html')
+    return render(request,'login.html')
 
 def signinuser(request):
-    return render(request,'signup.html')
+    if request.method == 'POST':
+        uname=request.POST.get("uname")
+        email=request.POST.get("email")
+        password=request.POST.get("password")
+        
+        fname=request.POST.get("fname")
+        lname=request.POST.get("lname")
+        
+        user = User.objects.create_user(uname,email,password)
+        user.last_name = lname
+        user.first_name = fname
 
-    # return redirect('/login')
+        user.save()
+
+        #
+        login(request,user)
+        return redirect('/')
+    
+    else:
+        return render(request,'signup.html')
